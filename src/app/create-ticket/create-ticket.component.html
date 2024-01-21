@@ -1,0 +1,74 @@
+  <header>
+    <button id="logout" onclick="logout()">Logout</button>
+  </header>
+  <div>
+    <h3>Create new Ticket</h3>
+  </div>
+  <div id="formForCreatingTicket">
+    <div id="category" class="input-group mb-2">
+      <span class="text">Category</span>
+      <select class="form-select" id="inputGroupSelect01" required>
+        <option selected></option>
+        <option value="1">Application & Services</option>
+        <option value="2">Benefits & Paper Work</option>
+        <option value="3">Hardware & Software</option>
+        <option value="4">People Management</option>
+        <option value="5">Security & Access</option>
+        <option value="6">Workplaces & Facilities</option>
+      </select>
+    </div>
+
+    <div id="name" class="input-group mb-3">
+      <span class="text">Name</span>
+      <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" required>
+    </div>
+
+    <div id="description" class="input-group">
+      <span class="text">Description</span>
+      <textarea class="form-control" aria-label="С текстовым полем"></textarea>
+    </div>
+
+    <div id="urgency" class="input-group mb-2">
+      <span class="text">Urgency</span>
+      <select class="form-select" id="inputGroupSelect02" required>
+        <option selected></option>
+        <option value="1">Critical</option>
+        <option value="2">High</option>
+        <option value="3">Average</option>
+        <option value="4">Low</option>
+      </select>
+    </div>
+
+    <div id="date">
+      <label class="text" for="start">Desired resolution date</label>
+      <input type="date" id="start" name="trip-start" onkeydown="return false"/>
+    </div>
+
+    <form enctype="multipart/form-data" method="post">
+      <p>
+        <label class="text" for="fileInput">Add attachment</label>
+        <input type="file" id="fileInput" name="f" accept=".jpg, .jpeg, .png .pdf, .png, .doc, .docx, .jpg, .jpeg" />
+      </p>
+    </form>
+
+    <div id="comment" class="input-group">
+      <span class="text">Comment</span>
+      <textarea class="form-control" aria-label="С текстовым полем"></textarea>
+    </div>
+
+    <div id="buttons">
+      <button id="draft" onclick="">Save as Draft</button>
+      <button id="submit" onclick="">Submit</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+  <script>
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    const inputElement = document.getElementById('start');
+    inputElement.value = formattedDate;
+    inputElement.min = formattedDate;
+  </script>
