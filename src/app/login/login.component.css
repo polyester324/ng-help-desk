@@ -7,19 +7,32 @@
 .login-container {
     width: 20%;
     background-color: white;
-    padding: 20px;
+    margin-top: 6%;
+    padding: 30px;
+    padding-top: 5px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
-h2 {
-    margin-bottom: 20px;
+h1 {
+    margin-bottom: 30px;
+}
+ 
+.error-message {
+    margin-top: -10px;
+    color: red;
+}
+
+#login {
+    font-size: 32px;
+    margin-top: 10px;
 }
 
 label {
     display: block;
     margin-bottom: 8px;
+    font-size: 26px;
 }
 
 input {

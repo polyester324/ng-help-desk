@@ -1,74 +1,79 @@
   <header>
-    <button id="logout" onclick="logout()">Logout</button>
+    <button id="allTickets" (click)="allTickets()">All Tickets</button>
+    <button id="logout" (click)="logout()">Logout</button>
   </header>
   <div>
-    <h3>Create new Ticket</h3>
+    <h1>Create new Ticket</h1>
   </div>
   <div id="formForCreatingTicket">
     <div id="category" class="input-group mb-2">
       <span class="text">Category</span>
-      <select class="form-select" id="inputGroupSelect01" required>
+      <select  [(ngModel)]="category" class="form-select" id="inputGroupSelect01" required>
         <option selected></option>
-        <option value="1">Application & Services</option>
-        <option value="2">Benefits & Paper Work</option>
-        <option value="3">Hardware & Software</option>
-        <option value="4">People Management</option>
-        <option value="5">Security & Access</option>
-        <option value="6">Workplaces & Facilities</option>
+        <option value="Application & Services">Application & Services</option>
+        <option value="Benefits & Paper Work">Benefits & Paper Work</option>
+        <option value="Hardware & Software">Hardware & Software</option>
+        <option value="People Management">People Management</option>
+        <option value="Security & Access">Security & Access</option>
+        <option value="Workplaces & Facilities">Workplaces & Facilities</option>
       </select>
     </div>
 
     <div id="name" class="input-group mb-3">
       <span class="text">Name</span>
-      <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" required>
+      <input [(ngModel)]="name" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" required>
     </div>
 
     <div id="description" class="input-group">
       <span class="text">Description</span>
-      <textarea class="form-control" aria-label="С текстовым полем"></textarea>
+      <textarea [(ngModel)]="description" class="form-control-big" aria-label="С текстовым полем"></textarea>
     </div>
 
     <div id="urgency" class="input-group mb-2">
       <span class="text">Urgency</span>
-      <select class="form-select" id="inputGroupSelect02" required>
+      <select [(ngModel)]="urgency" class="form-select" id="inputGroupSelect02" required>
         <option selected></option>
-        <option value="1">Critical</option>
-        <option value="2">High</option>
-        <option value="3">Average</option>
-        <option value="4">Low</option>
+        <option value="CRITICAL">Critical</option>
+        <option value="HIGH">High</option>
+        <option value="AVERAGE">Average</option>
+        <option value="LOW">Low</option>
       </select>
     </div>
 
     <div id="date">
       <label class="text" for="start">Desired resolution date</label>
-      <input type="date" id="start" name="trip-start" onkeydown="return false"/>
+      <input [(ngModel)]="desiredResolutionDate" type="date" id="start" name="trip-start" onkeydown="return false"/>
     </div>
 
-    <form enctype="multipart/form-data" method="post">
+    <!-- <form enctype="multipart/form-data" method="post">
       <p>
         <label class="text" for="fileInput">Add attachment</label>
-        <input type="file" id="fileInput" name="f" accept=".jpg, .jpeg, .png .pdf, .png, .doc, .docx, .jpg, .jpeg" />
+        <input (change)="handleFileInput($event)" type="file" id="fileInput" name="f" accept=".pdf, .doc, .docx, .png, .jpeg, .jpg" multiple/>
       </p>
+      <div *ngIf="wrongFileType" style="color: red;">The selected file type is not allowed. Please select a file of one of the following types: pdf, png, doc, docx, jpg, jpeg.</div>
+      <div *ngIf="wrongFileSize" style="color: red;">The size of attached file should not be greater than 5 Mb. Please select another file.</div>
+    </form> -->
+
+    <form enctype="multipart/form-data" method="post">
+      <div *ngFor="let fileInput of fileInputs; let i = index">
+        <p>
+          <label class="text" for="fileInput{{ i }}">Add attachment</label>
+          <input (change)="handleFileInput($event, i)" type="file" id="fileInput{{ i }}" name="f" accept=".pdf, .doc, .docx, .png, .jpeg, .jpg"/>
+          <span *ngIf="i > 0" (click)="removeFileInput(i)" style="cursor: pointer;">❌</span>
+        </p>
+        <div *ngIf="wrongFileType[i]" style="color: red;">The selected file type is not allowed. Please select a file of one of the following types: pdf, png, doc, docx, jpg, jpeg.</div>
+        <div *ngIf="wrongFileSize[i]" style="color: red;">The size of attached file should not be greater than 5 Mb. Please select another file.</div>
+      </div>
+      <button (click)="addFileInput()">Add Attachment</button>
     </form>
 
     <div id="comment" class="input-group">
       <span class="text">Comment</span>
-      <textarea class="form-control" aria-label="С текстовым полем"></textarea>
+      <textarea [(ngModel)]="comment" class="form-control-big" aria-label="С текстовым полем"></textarea>
     </div>
 
     <div id="buttons">
-      <button id="draft" onclick="">Save as Draft</button>
-      <button id="submit" onclick="">Submit</button>
+      <button id="draft" (click)="saveAsDraft()">Save as Draft</button>
+      <button id="submit" (click)="submit()">Submit</button>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-  <script>
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
-    const inputElement = document.getElementById('start');
-    inputElement.value = formattedDate;
-    inputElement.min = formattedDate;
-  </script>

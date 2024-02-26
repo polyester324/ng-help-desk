@@ -1,295 +1,40 @@
 <header>
-  <button id="logout" onclick="logout()">Logout</button>
+  <button id="logout" (click)="logout()">Logout</button>
 </header>
 
 <div id="createTicketContainer">
-  <button id="createTicketButton" onclick="createTicketPage()">Create Ticket</button>
+  <button id="createTicketButton" (click)="createTicket()">Create Ticket</button>
 </div>
 
 <div id="additionalButtonsContainer">
-  <button onclick="getAllTicketsAdditional()" class="additionalButton">All tickets</button>
-  <button onclick="getAllTicketsMineAdditional()" class="additionalButton">My tickets</button>
+  <button (click)="getAllTickets()" class="additionalButton">All tickets</button>
+  <button (click)="getAllTicketsMine()" class="additionalButton">My tickets</button>
 </div>
 
 <div id="filterContainer">
-  <input type="text" id="filter" oninput="filterTable()" onkeyup="if(text.test(this.value)) this.value=''">
+  <input type="text" id="filter" [(ngModel)]="filterText" (input)="filterTable()">
+  <div *ngIf="!isInputValid" style="color: red;">Incorrect input</div>
 </div>
 
 <table id="ticketsList">
+  <tr>
+    <th>ID<button class='sort-button' (click)='idSortAsc()'>🔼</button><button class='sort-button' (click)='idSortDes()'>🔽</button></th>
+    <th>Name<button class='sort-button' (click)='nameSortAsc()'>🔼</button><button class='sort-button' (click)='nameSortDes()'>🔽</button></th>
+    <th>Desired date<button class='sort-button' (click)='dateSortAsc()'>🔼</button><button class='sort-button' (click)='dateSortDes()'>🔽</button></th>
+    <th>Urgency<button class='sort-button' (click)='urgencySortAsc()'>🔼</button><button class='sort-button' (click)='urgencySortDes()'>🔽</button></th>
+    <th>Status<button class='sort-button' (click)='statusSortAsc()'>🔼</button><button class='sort-button' (click)='statusSortDes()'>🔽</button></th>
+    <th>Action</th>
+  </tr>
+
+  <tr *ngFor="let ticket of filteredTickets">
+    <td>{{ticket.id}}</td>
+    <td>{{ticket.name}}</td>
+    <td>{{ticket.desiredResolutionDate}}</td>
+    <td>{{ticket.urgencyId}}</td>
+    <td>{{ticket.stateId}}</td>
+    <td><button>Action</button></td>
+  </tr>
 </table>
-
-<script>
-  const ticketUrl = 'http://localhost:8082/help-desk/ticket/all';
-  const ticketMineUrl = 'http://localhost:8082/help-desk/ticket/mine';
-  const createTicketUrl = 'create-ticket.html';
-  let lastUrl = null;
-  let text = /[^a-zA-Z0-9~.()",:;<>@'\[\]!#$%&*+\-/=?^_`{|}]/;
-
-  // GET for all tickets
-  function getAllTickets(token) {
-    lastUrl = ticketUrl;
-    fetch(ticketUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-            .then(response => response.json())
-            .then(data => {
-              displayTickets(data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-  }
-
-  // GET for specified tickets
-  function getAllTicketsMine(token) {
-    lastUrl = ticketMineUrl;
-    fetch(ticketMineUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-            .then(response => response.json())
-            .then(data => {
-              displayTickets(data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-  }
-
-  const token = localStorage.getItem('token');
-
-
-  function fetchCreateTicketPage(token){
-    fetch('create-ticket.html', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
-              return response.text(); // или response.json() в зависимости от ожидаемого формата ответа
-            })
-            .then(data => {
-              console.log('Response:', data);
-              // Перенаправление пользователя, если необходимо
-              window.location.href = 'create-ticket.html';
-            })
-            .catch(error => {
-              console.error('Error:', error);
-            });
-  }
-
-  function toggleSort(order, name) {
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetchTicketsAndSort(token, order, name);
-    } else {
-      console.error('Token not found in Local Storage.');
-    }
-  }
-
-  // Function to fetch tickets and perform sorting
-  function fetchTicketsAndSort(token, order, name) {
-    fetch(lastUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-            .then(response => response.json())
-            .then(data => {
-              switch (name) {
-                case 'ID':
-                  sortTicketsId(order, data);
-                  break;
-                case 'NAME':
-                  sortTicketsName(order, data);
-                  break;
-                case 'DESIRED_DATE':
-                  sortTicketsDesiredDate(order, data);
-                  break;
-                case 'URGENCY':
-                  sortTicketsUrgency(order, data);
-                  break;
-                case 'STATUS':
-                  sortTicketsStatus(order, data);
-                  break;
-              }
-              displayTickets(data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-  }
-
-  // GET for all tickets
-  function getAllTicketsAdditional() {
-    if (token) {
-      getAllTickets(token);
-    } else {
-      console.error('Token not found in Local Storage.');
-    }
-  }
-
-  // GET for specified tickets
-  function createTicketPage() {
-    if (token) {
-      fetchCreateTicketPage(token);
-    } else {
-      console.error('Token not found in Local Storage.');
-    }
-  }
-
-  function getAllTicketsMineAdditional() {
-    if (token) {
-      getAllTicketsMine(token);
-    } else {
-      console.error('Token not found in Local Storage.');
-    }
-  }
-
-  function displayTickets(tickets) {
-    const ticketsList = document.getElementById("ticketsList");
-    ticketsList.innerHTML = '';
-
-    const table = document.createElement("table");
-    table.classList.add("table");
-    const thead = document.createElement("thead");
-    thead.innerHTML = "<tr>" +
-            "<th>ID<button class='sort-button' onclick='toggleSort(\"asc\", \"ID\")'>🔼</button><button class='sort-button' onclick='toggleSort(\"desc\", \"ID\")'>🔽</button></th>" +
-            "<th>Name<button class='sort-button' onclick='toggleSort(\"asc\", \"NAME\")'>🔼</button><button class='sort-button' onclick='toggleSort(\"desc\", \"NAME\")'>🔽</button></th>" +
-            "<th>Desired date<button class='sort-button' onclick='toggleSort(\"asc\", \"DESIRED_DATE\")'>🔼</button><button class='sort-button' onclick='toggleSort(\"desc\", \"DESIRED_DATE\")'>🔽</button></th>" +
-            "<th>Urgency<button class='sort-button' onclick='toggleSort(\"asc\", \"URGENCY\")'>🔼</button><button class='sort-button' onclick='toggleSort(\"desc\", \"URGENCY\")'>🔽</button></th>" +
-            "<th>Status<button class='sort-button' onclick='toggleSort(\"asc\", \"STATUS\")'>🔼</button><button class='sort-button' onclick='toggleSort(\"desc\", \"STATUS\")'>🔽</button></th>" +
-            "<th>Action</th>" +
-            "</tr>";
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-
-    tickets.forEach(ticket => {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td>${ticket.id}</td><td>${ticket.name}</td><td>${formatDate(ticket.desiredResolutionDate)}</td><td>${ticket.urgencyId}</td><td>${ticket.stateId}</td><td><button class="actionButton" onclick="performAction(${ticket.id})">Action</button></td>`;
-      tbody.appendChild(row);
-    });
-
-    table.appendChild(tbody);
-    ticketsList.appendChild(table);
-  }
-
-  /*Sorts*/
-  function sortTicketsId(order, tickets) {
-    if (order === 'asc') {
-      tickets.sort((a, b) => a.id - b.id);
-    } else if (order === 'desc') {
-      tickets.sort((a, b) => b.id - a.id);
-    }
-  }
-  function sortTicketsName(order, tickets) {
-    if (order === 'asc') {
-      tickets.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (order === 'desc') {
-      tickets.sort((a, b) => b.name.localeCompare(a.name));
-    }
-  }
-  function sortTicketsDesiredDate(order, tickets) {
-    const convertToDate = (dateString) => new Date(dateString);
-
-    if (order === 'asc') {
-      tickets.sort((a, b) => convertToDate(a.desiredResolutionDate) - convertToDate(b.desiredResolutionDate));
-    } else if (order === 'desc') {
-      tickets.sort((a, b) => convertToDate(b.desiredResolutionDate) - convertToDate(a.desiredResolutionDate));
-    }
-  }
-  function sortTicketsUrgency(order, tickets) {
-    const urgencyOrder = ['CRITICAL', 'HIGH', 'AVERAGE', 'LOW'];
-
-    if (order === 'asc') {
-      tickets.sort((a, b) => urgencyOrder.indexOf(a.urgencyId) - urgencyOrder.indexOf(b.urgencyId));
-    } else if (order === 'desc') {
-      tickets.sort((a, b) => urgencyOrder.indexOf(b.urgencyId) - urgencyOrder.indexOf(a.urgencyId));
-    }
-  }
-  function sortTicketsStatus(order, tickets) {
-    if (order === 'asc') {
-      tickets.sort((a, b) => a.stateId.localeCompare(b.stateId));
-    } else if (order === 'desc') {
-      tickets.sort((a, b) => b.stateId.localeCompare(a.stateId));
-    }
-  }
-
-  function filterTable() {
-    const filterValue = document.getElementById('filter').value.toUpperCase();
-
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetch(lastUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-              .then(response => response.json())
-              .then(data => {
-                const filteredData = data.filter(ticket => {
-                  for (const key in ticket) {
-                    if (ticket.hasOwnProperty(key) && typeof ticket[key] === 'string') {
-                      const fieldValue = ticket[key].toString().toUpperCase();
-                      if (fieldValue.includes(filterValue)) {
-                        return true;
-                      }
-                    }
-                  }
-                  return false;
-                });
-                displayTickets(filteredData);
-              })
-              .catch((error) => {
-                console.error('Error:', error);
-              });
-    } else {
-      console.error('Token not found in Local Storage.');
-    }
-  }
-
-  function logout() {
-    localStorage.removeItem('token');
-    window.location.href = 'login.html';
-  }
-
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-
-    return `${day}/${month}/${year}`;
-  }
-
-  function performAction(ticketId) {
-    console.log(`Performing action for ticket with ID ${ticketId}`);
-  }
-
-  // check token in Local Storage
-  document.addEventListener("DOMContentLoaded", function () {
-    if (token) {
-      getAllTickets(token);
-    } else {
-      console.error('Token not found in Local Storage.');
-      /*window.location.href = 'login.html';*/
-    }
-  });
-</script>
+<div id="buttons">
+  <button id="draft" (click)="users()">users</button>
+</div>
